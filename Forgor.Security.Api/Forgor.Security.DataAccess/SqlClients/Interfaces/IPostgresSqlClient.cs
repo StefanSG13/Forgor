@@ -1,6 +1,6 @@
 ﻿namespace Forgor.Security.DataAccess.SqlClients;
 
-internal interface IPostgresSqlClient
+public interface IPostgresSqlClient
 {
     Task<T> GetAsync<T>(string sql, object parameters = default!);
     Task<IEnumerable<T>> GetAllAsync<T>(string sql, object parameters = default!);

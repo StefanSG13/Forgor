@@ -4,7 +4,7 @@ using Npgsql;
 
 namespace Forgor.Security.DataAccess.SqlClients;
 
-internal class PostgresSqlClient : IPostgresSqlClient
+public class PostgresSqlClient : IPostgresSqlClient
 {
     private readonly string _connectionString;
 
@@ -14,7 +14,11 @@ internal class PostgresSqlClient : IPostgresSqlClient
                                Port={configuration["POSTGRES_PORT"]};
                                Database={configuration["POSTGRES_DATABASE"]};
                                User Id={configuration["POSTGRES_USERNAME"]};
-                               Password={configuration["POSTGRES_PASSWORD"]};";
+                               Password={configuration["POSTGRES_PASSWORD"]};
+                               Timeout=300;
+                               CommandTimeout=300";
+
+        Console.WriteLine(_connectionString);
     }
 
     public Task DeleteAsync(string sql, object parameters = default!)
@@ -27,9 +31,16 @@ internal class PostgresSqlClient : IPostgresSqlClient
         throw new NotImplementedException();
     }
 
-    public Task<T> GetAsync<T>(string sql, object parameters = default!)
+    public async Task<T> GetAsync<T>(string sql, object parameters = default!)
     {
-        throw new NotImplementedException();
+        using var con = CreateConnection();
+        await con.OpenAsync();
+
+        var result = await con.QueryFirstOrDefaultAsync<T>(sql, parameters);
+
+        await con.CloseAsync();
+
+        return result!;
     }
 
     public async Task InsertAsync(string sql, object parameters = default!)
@@ -37,8 +48,8 @@ internal class PostgresSqlClient : IPostgresSqlClient
         using var con = CreateConnection();
         await con.OpenAsync();
 
-        await con.ExecuteAsync(sql);
-        
+        await con.QueryAsync(sql, parameters);
+
         await con.CloseAsync();
     }
 

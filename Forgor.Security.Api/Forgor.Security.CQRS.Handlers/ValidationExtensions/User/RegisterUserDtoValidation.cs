@@ -23,7 +23,7 @@ internal static class RegisterUserDtoValidation
         if (!CommonValidations.IsNameValid(dto.MiddleName))
             errors.Add("Middle name is invalid");
 
-        if (CommonValidations.IsEmailValid(dto.Email))
+        if (!CommonValidations.IsEmailValid(dto.Email))
             errors.Add("Email is invalid");
 
         if (!CommonValidations.IsPasswordValid(dto.Password))
